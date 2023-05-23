@@ -58,7 +58,41 @@ jobs:
         run: ls -R build || true
       - name: Build FFMpeg Libs
         run: bash build-with-docker.sh install-deps ${{ matrix.script }}
-  build-ffmpeg:
+  # build-ffmpeg:
+  #   runs-on: ubuntu-latest
+  #   needs: build-libs
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #       with:
+  #         submodules: recursive
+  #     - name: Get commit hash
+  #       id: get-commit-hash
+  #       run: |
+  #         echo "::set-output name=hash::$(git rev-parse --short HEAD)"
+  #     - name: Cache multiple paths
+  #       uses: actions/cache@v2
+  #       env:
+  #         GIT_HASH: $(git rev-parse --short HEAD)
+  #       with:
+  #         path: |
+  #           build
+  #           wasm/cache
+  #         key: ${{ env.CACHE_KEY_PREFIX }}-${{ steps.get-commit-hash.outputs.hash }}-ffmpeg
+  #         restore-keys: |
+  #           ${{ env.CACHE_KEY_PREFIX }}-${{ steps.get-commit-hash.outputs.hash }}-
+  #     - name: List cached libs
+  #       run: ls -R build || true
+  #     - name: Build FFMpeg
+  #       run: |
+  #         bash build-with-docker.sh \
+  #           install-deps \
+  #           configure-ffmpeg \
+  #           build-ffmpeg
+  #     - uses: actions/upload-artifact@master
+  #       with:
+  #         name: ffmpeg-core
+  #         path: ${{ env.DIST_PATH }}
+  build-ffprobe:
     runs-on: ubuntu-latest
     needs: build-libs
     steps:
@@ -86,13 +120,12 @@ jobs:
         run: |
           bash build-with-docker.sh \
             install-deps \
-            configure-ffmpeg \
-            build-ffmpeg
+            configure-ffprobe \
+            build-ffprobe
       - uses: actions/upload-artifact@master
         with:
-          name: ffmpeg-core
+          name: ffprobe-core
           path: ${{ env.DIST_PATH }}
-
   # Disable macos build due to there is no ldconfig command
   # during freetype2 build.
   # macos-build:
